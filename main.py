@@ -10,6 +10,8 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.popup = QMessageBox()
         self.inputPopup = QInputDialog()
+        self.completed = 0
+        self.num_tasks = 0
         
         study_methods = ["Traditional Pomodoro", "Extended Pomodoro", "Animedoro"]
         self.study_intervals = ["25 minutes", "50 minutes", "40-60 minutes"]
@@ -30,10 +32,27 @@ class MainWindow(QMainWindow):
         
         self.ui.deleteButton.clicked.connect(self.deleteTask)
         
+        self.ui.completeLabel.setText("Number of Tasks Completed: " + str(self.completed))
+        self.ui.incompleteLabel.setText("Number of Tasks Completed: " + str(self.num_tasks - self.completed))
+        
         #Setting up the Table
         self.ui.tasksTable.setColumnCount(5)
         self.ui.tasksTable.setHorizontalHeaderLabels(["Task Name", "Subject", "Estimated Duration", "Actual Time Taken", "Completed"])
         self.ui.tasksTable.resizeColumnsToContents()
+        
+    def updateLabels(self):
+        self.ui.completeLabel.setText("Number of Tasks Completed: " + str(self.completed))
+        self.ui.incompleteLabel.setText("Number of Tasks Incomplete: " + str(self.num_tasks - self.completed))
+        time_worked = 0
+        est_time_left = 0
+        for i in range(0, self.ui.tasksTable.rowCount()):
+            if self.ui.tasksTable.item(i, 4).text() == "Yes":
+                time_worked += int(self.ui.tasksTable.item(i, 3).text())
+            else:
+                est_time_left += int(self.ui.tasksTable.item(i, 2).text())
+        self.ui.timeWorkedLabel.setText("Total Time Worked: " + str(time_worked) + " minutes = " + str(round(time_worked/60, 2)) + " hours")
+        self.ui.timeNeededLabel.setText("Estimated Time Needed to Finish: " + str(est_time_left) + " minutes = " + str(round(est_time_left/60,2)) + " hours")
+        
         
     def addTask(self):
         if self.ui.taskBox.text() == "" or self.ui.subjectBox.text() == "" or self.ui.timeBox.text() == "":
@@ -46,6 +65,13 @@ class MainWindow(QMainWindow):
             self.ui.tasksTable.setItem(self.ui.tasksTable.rowCount() - 1, 3, QTableWidgetItem(""))
             self.ui.tasksTable.setItem(self.ui.tasksTable.rowCount() - 1, 4, QTableWidgetItem("No"))
             self.ui.tasksTable.resizeColumnsToContents()
+            
+            self.ui.taskBox.clear()
+            self.ui.subjectBox.clear()
+            self.ui.timeBox.clear()
+            
+            self.num_tasks += 1
+            self.updateLabels()
     
     def completeTask(self):
         time_taken, formality = QInputDialog().getText(self, "Mark as Complete",
@@ -54,8 +80,13 @@ class MainWindow(QMainWindow):
         self.ui.tasksTable.setItem(current_row, 3, QTableWidgetItem(time_taken))
         self.ui.tasksTable.setItem(current_row, 4, QTableWidgetItem("Yes"))
         
+        self.completed += 1
+        self.updateLabels()
+        
     def deleteTask(self):
         current_row = self.ui.tasksTable.currentRow()
+        if self.ui.tasksTable.item(current_row, 4).text() == "Yes":
+            self.completed -= 1
         if current_row != self.ui.tasksTable.rowCount() - 1:
             for i in range(current_row, self.ui.tasksTable.rowCount() - 1):
                 self.ui.tasksTable.setItem(i, 0, QTableWidgetItem(self.ui.tasksTable.item(i+1, 0).text()))
@@ -65,6 +96,10 @@ class MainWindow(QMainWindow):
                 self.ui.tasksTable.setItem(i, 4, QTableWidgetItem(self.ui.tasksTable.item(i+1, 4).text())) 
                 
         self.ui.tasksTable.setRowCount(self.ui.tasksTable.rowCount() - 1)
+        
+        self.num_tasks -= 1
+        
+        self.updateLabels()
         
     def updateMethods(self):
         method = self.ui.productivityChoose.currentIndex()
@@ -77,7 +112,10 @@ class MainWindow(QMainWindow):
             number = self.ui.tasksTable.rowCount()
         else:
             number = random.randint(1, self.ui.tasksTable.rowCount())
-        time.sleep(3)
+            while self.ui.tasksTable.item(number - 1, 4).text() == "Yes":
+                number = random.randint(1, self.ui.tasksTable.rowCount())
+                
+        time.sleep(1)
         self.ui.taskChosenLabel.setText(str(number))
 
 if __name__ == "__main__":
