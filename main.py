@@ -1,5 +1,5 @@
 import sys, random, time
-from PySide2.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox
+from PySide2.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox, QInputDialog, QLineEdit
 from PySide2.QtCore import QFile, QRandomGenerator
 from ui_mainwindow import Ui_MainWindow
 
@@ -9,6 +9,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.popup = QMessageBox()
+        self.inputPopup = QInputDialog()
         
         study_methods = ["Traditional Pomodoro", "Extended Pomodoro", "Animedoro"]
         self.study_intervals = ["25 minutes", "50 minutes", "40-60 minutes"]
@@ -23,25 +24,47 @@ class MainWindow(QMainWindow):
         
         self.ui.chooseButton.clicked.connect(self.selectTask)
         
-        self.ui.addTaskButton.clicked.connect(self.addTasks)
+        self.ui.addTaskButton.clicked.connect(self.addTask)
+        
+        self.ui.completeButton.clicked.connect(self.completeTask)
+        
+        self.ui.deleteButton.clicked.connect(self.deleteTask)
         
         #Setting up the Table
         self.ui.tasksTable.setColumnCount(5)
         self.ui.tasksTable.setHorizontalHeaderLabels(["Task Name", "Subject", "Estimated Duration", "Actual Time Taken", "Completed"])
+        self.ui.tasksTable.resizeColumnsToContents()
         
-    def addTasks(self):
+    def addTask(self):
         if self.ui.taskBox.text() == "" or self.ui.subjectBox.text() == "" or self.ui.timeBox.text() == "":
            self.popup.warning(self, "Error", "One or more fields are empty" + "\n Please Complete and Retry.") 
         else:
             self.ui.tasksTable.setRowCount(self.ui.tasksTable.rowCount() + 1)
-            task_item = QTableWidgetItem(self.ui.taskBox.text())
-            subject_item = QTableWidgetItem(self.ui.subjectBox.text())
-            eta_item = QTableWidgetItem(self.ui.timeBox.text())
-            print(task_item)
-            self.ui.tasksTable.setItem(self.ui.tasksTable.rowCount() - 1, 0, task_item)
-            self.ui.tasksTable.setItem(self.ui.tasksTable.rowCount() - 1, 1, subject_item)
-            self.ui.tasksTable.setItem(self.ui.tasksTable.rowCount() - 1, 2, eta_item)
-
+            self.ui.tasksTable.setItem(self.ui.tasksTable.rowCount() - 1, 0, QTableWidgetItem(self.ui.taskBox.text()))
+            self.ui.tasksTable.setItem(self.ui.tasksTable.rowCount() - 1, 1, QTableWidgetItem(self.ui.subjectBox.text()))
+            self.ui.tasksTable.setItem(self.ui.tasksTable.rowCount() - 1, 2, QTableWidgetItem(self.ui.timeBox.text()))
+            self.ui.tasksTable.setItem(self.ui.tasksTable.rowCount() - 1, 3, QTableWidgetItem(""))
+            self.ui.tasksTable.setItem(self.ui.tasksTable.rowCount() - 1, 4, QTableWidgetItem("No"))
+            self.ui.tasksTable.resizeColumnsToContents()
+    
+    def completeTask(self):
+        time_taken, formality = QInputDialog().getText(self, "Mark as Complete",
+                                     "Time Taken to Complete:", QLineEdit.Normal)
+        current_row = self.ui.tasksTable.currentRow()
+        self.ui.tasksTable.setItem(current_row, 3, QTableWidgetItem(time_taken))
+        self.ui.tasksTable.setItem(current_row, 4, QTableWidgetItem("Yes"))
+        
+    def deleteTask(self):
+        current_row = self.ui.tasksTable.currentRow()
+        if current_row != self.ui.tasksTable.rowCount() - 1:
+            for i in range(current_row, self.ui.tasksTable.rowCount() - 1):
+                self.ui.tasksTable.setItem(i, 0, QTableWidgetItem(self.ui.tasksTable.item(i+1, 0).text()))
+                self.ui.tasksTable.setItem(i, 1, QTableWidgetItem(self.ui.tasksTable.item(i+1, 1).text()))
+                self.ui.tasksTable.setItem(i, 2, QTableWidgetItem(self.ui.tasksTable.item(i+1, 2).text()))
+                self.ui.tasksTable.setItem(i, 3, QTableWidgetItem(self.ui.tasksTable.item(i+1, 3).text()))
+                self.ui.tasksTable.setItem(i, 4, QTableWidgetItem(self.ui.tasksTable.item(i+1, 4).text())) 
+                
+        self.ui.tasksTable.setRowCount(self.ui.tasksTable.rowCount() - 1)
         
     def updateMethods(self):
         method = self.ui.productivityChoose.currentIndex()
