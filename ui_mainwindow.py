@@ -25,6 +25,10 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
+        self.actionNew_Day = QAction(MainWindow)
+        self.actionNew_Day.setObjectName(u"actionNew_Day")
+        self.actionNewDay = QAction(MainWindow)
+        self.actionNewDay.setObjectName(u"actionNewDay")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.tasksTable = QTableWidget(self.centralwidget)
@@ -134,10 +138,15 @@ class Ui_MainWindow(object):
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 1280, 25))
+        self.menuNew_Day = QMenu(self.menubar)
+        self.menuNew_Day.setObjectName(u"menuNew_Day")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         MainWindow.setStatusBar(self.statusbar)
+
+        self.menubar.addAction(self.menuNew_Day.menuAction())
+        self.menuNew_Day.addAction(self.actionNewDay)
 
         self.retranslateUi(MainWindow)
 
@@ -146,6 +155,8 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ToDoPlus", None))
+        self.actionNew_Day.setText(QCoreApplication.translate("MainWindow", u"New Day", None))
+        self.actionNewDay.setText(QCoreApplication.translate("MainWindow", u"New Day (Clear)", None))
         self.taskHeader.setText(QCoreApplication.translate("MainWindow", u"Add a Task", None))
         self.subjectLabel.setText(QCoreApplication.translate("MainWindow", u"Subject", None))
         self.taskLabel.setText(QCoreApplication.translate("MainWindow", u"Task Name", None))
@@ -166,5 +177,6 @@ class Ui_MainWindow(object):
         self.incompleteLabel.setText(QCoreApplication.translate("MainWindow", u"Number of Tasks Incomplete:", None))
         self.timeWorkedLabel.setText(QCoreApplication.translate("MainWindow", u"Total Time Worked:", None))
         self.timeNeededLabel.setText(QCoreApplication.translate("MainWindow", u"Estimated Time Needed to Finish:", None))
+        self.menuNew_Day.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
     # retranslateUi
 

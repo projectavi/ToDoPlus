@@ -433,8 +433,25 @@
      <height>25</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuNew_Day">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNewDay"/>
+   </widget>
+   <addaction name="menuNew_Day"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionNew_Day">
+   <property name="text">
+    <string>New Day</string>
+   </property>
+  </action>
+  <action name="actionNewDay">
+   <property name="text">
+    <string>New Day (Clear)</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
