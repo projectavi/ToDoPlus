@@ -1,6 +1,6 @@
-import sys
+import sys, random, time
 from PySide2.QtWidgets import QApplication, QMainWindow
-from PySide2.QtCore import QFile
+from PySide2.QtCore import QFile, QRandomGenerator
 from ui_mainwindow import Ui_MainWindow
 
 class MainWindow(QMainWindow):
@@ -19,6 +19,8 @@ class MainWindow(QMainWindow):
         self.updateMethods()
         
         self.ui.productivityChoose.currentIndexChanged.connect(self.updateMethods)
+        
+        self.ui.chooseButton.clicked.connect(self.selectTask)
             
         
     def updateMethods(self):
@@ -26,11 +28,19 @@ class MainWindow(QMainWindow):
         self.ui.workLabel.setText("Work Interval: " + self.study_intervals[method])
         self.ui.breakLabel.setText("Break Interval: " + self.break_intervals[method])
         self.ui.cyclesLabel.setText("Cycles at a Time: " + self.cycles[method])
+        
+    def selectTask(self):
+        if self.ui.tasksTable.rowCount() == 0 or self.ui.tasksTable.rowCount() == 1:
+            number = self.ui.tasksTable.rowCount()
+        else:
+            number = random.randint(1, self.ui.tasksTable.rowCount())
+        time.sleep(3)
+        self.ui.taskChosenLabel.setText(str(number))
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     window = MainWindow()
     window.show()
-
+    
     sys.exit(app.exec_())
