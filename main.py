@@ -1,7 +1,7 @@
 import sys, random, time, os
 import numpy as np
 from PySide2.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox, QInputDialog, QLineEdit
-from PySide2.QtCore import QFile, QRandomGenerator
+from PySide2.QtCore import QTimer
 from ui_mainwindow import Ui_MainWindow
 
 class MainWindow(QMainWindow):
@@ -12,6 +12,11 @@ class MainWindow(QMainWindow):
         self.popup = QMessageBox()
         self.inputPopup = QInputDialog()
         self.tasks = []
+        self.timer = False
+        self.study_time = 0
+        self.break_time = 0
+        self.second_count = 60
+        self.status = "Work"
         
         #Setting up the Table
         self.ui.tasksTable.setColumnCount(5)
@@ -27,7 +32,7 @@ class MainWindow(QMainWindow):
         
         study_methods = ["Traditional Pomodoro", "Extended Pomodoro", "Animedoro"]
         self.study_intervals = ["25 minutes", "50 minutes", "40-60 minutes"]
-        self.break_intervals = ["5 minutes", "10 minutes", "approx. 20 minutes - 1 anime (or other 20 minute) episode"]
+        self.break_intervals = ["5 minutes", "10 minutes", "approx. 20 minutes - one anime (or other with a similar duration) episode"]
         self.cycles = ["4, then take 15-30 minutes as a break", "2, then take 15-30 minutes as a break", "2, then take an extra 10 minutes"]
         
         self.ui.productivityChoose.addItems(study_methods)
@@ -45,6 +50,61 @@ class MainWindow(QMainWindow):
         self.ui.deleteButton.clicked.connect(self.deleteTask)
         
         self.ui.actionNewDay.triggered.connect(self.clear)
+        
+        self.ui.timerButton.clicked.connect(self.startCycle)
+        
+        self.ui.endButton.clicked.connect(self.endEarly)
+        
+        self.ui.resetButton.clicked.connect(self.newCycle)
+        
+        timer = QTimer(self)
+        timer.timeout.connect(self.cycleTimer)
+        timer.start(1000) #change back to 1000
+        
+    def newCycle(self):
+        if self.timer == False:
+            self.updateMethods()
+        else:
+            self.popup.warning(self, "Error", "Cycle Already Running" + "\n Please 'End Early' before starting a new cycle") 
+        
+    def startCycle(self):
+        self.timer = True
+        
+    def endEarly(self):
+        self.timer = False
+        if self.minutes <= 20 and self.break_time == "20" and self.status == "Work":
+            self.minutes = self.break_time
+            self.second_count = 59
+            self.status = "Break"
+            self.ui.statusLabel.setText("BREAK")
+            self.timer = True
+        elif self.status == "Work":
+            self.ui.statusLabel.setText("CYCLE FAIL")
+        
+    def cycleTimer(self):
+        if self.timer:
+            if self.second_count == 0 and self.minutes != 0:
+                self.minutes -= 1
+                self.second_count = 59
+                self.second_count -= 1
+                self.ui.timerLabel.setText(str(self.minutes) + ":" + str(self.second_count))
+            elif self.second_count == 0 and self.minutes == 0:
+                if self.status == "Work":
+                    self.minutes = int(self.break_time) - 1
+                    self.second_count = 59
+                    self.status = "Break"
+                    self.ui.statusLabel.setText("BREAK")
+                    self.ui.timerLabel.setText(str(self.minutes) + ":" + str(self.second_count))
+                elif self.status == "Break":
+                    self.minutes = 0
+                    self.second_count = 0
+                    self.status = "Work"
+                    self.timer = False
+                    self.ui.statusLabel.setText("CYCLE OVER")
+                    self.ui.timerLabel.setText(str(self.minutes) + ":" + str(self.second_count))
+            else:
+                self.second_count -= 1
+                self.ui.timerLabel.setText(str(self.minutes) + ":" + str(self.second_count))
         
     def clear(self):
         self.tasks = []
@@ -149,6 +209,16 @@ class MainWindow(QMainWindow):
         self.ui.workLabel.setText("Work Interval: " + self.study_intervals[method])
         self.ui.breakLabel.setText("Break Interval: " + self.break_intervals[method])
         self.ui.cyclesLabel.setText("Cycles at a Time: " + self.cycles[method])
+        self.study_time = ''.join(i for i in self.study_intervals[method] if i.isdigit())
+        if self.study_time == "4060":
+            self.study_time = "60"
+        self.break_time = ''.join(i for i in self.break_intervals[method] if i.isdigit())
+        
+        minutes = self.study_time
+        self.ui.timerLabel.setText(str(minutes) + ":" + "00")
+        self.minutes = int(self.study_time) - 1
+        self.ui.statusLabel.setText("WORK")
+        self.status = "Work"
         
     def selectTask(self):
         if self.ui.tasksTable.rowCount() == 0 or self.ui.tasksTable.rowCount() == 1:
