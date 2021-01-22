@@ -1,5 +1,5 @@
 import sys, random, time
-from PySide2.QtWidgets import QApplication, QMainWindow
+from PySide2.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox
 from PySide2.QtCore import QFile, QRandomGenerator
 from ui_mainwindow import Ui_MainWindow
 
@@ -8,6 +8,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.popup = QMessageBox()
         
         study_methods = ["Traditional Pomodoro", "Extended Pomodoro", "Animedoro"]
         self.study_intervals = ["25 minutes", "50 minutes", "40-60 minutes"]
@@ -21,7 +22,26 @@ class MainWindow(QMainWindow):
         self.ui.productivityChoose.currentIndexChanged.connect(self.updateMethods)
         
         self.ui.chooseButton.clicked.connect(self.selectTask)
-            
+        
+        self.ui.addTaskButton.clicked.connect(self.addTasks)
+        
+        #Setting up the Table
+        self.ui.tasksTable.setColumnCount(5)
+        self.ui.tasksTable.setHorizontalHeaderLabels(["Task Name", "Subject", "Estimated Duration", "Actual Time Taken", "Completed"])
+        
+    def addTasks(self):
+        if self.ui.taskBox.text() == "" or self.ui.subjectBox.text() == "" or self.ui.timeBox.text() == "":
+           self.popup.warning(self, "Error", "One or more fields are empty" + "\n Please Complete and Retry.") 
+        else:
+            self.ui.tasksTable.setRowCount(self.ui.tasksTable.rowCount() + 1)
+            task_item = QTableWidgetItem(self.ui.taskBox.text())
+            subject_item = QTableWidgetItem(self.ui.subjectBox.text())
+            eta_item = QTableWidgetItem(self.ui.timeBox.text())
+            print(task_item)
+            self.ui.tasksTable.setItem(self.ui.tasksTable.rowCount() - 1, 0, task_item)
+            self.ui.tasksTable.setItem(self.ui.tasksTable.rowCount() - 1, 1, subject_item)
+            self.ui.tasksTable.setItem(self.ui.tasksTable.rowCount() - 1, 2, eta_item)
+
         
     def updateMethods(self):
         method = self.ui.productivityChoose.currentIndex()

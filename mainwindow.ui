@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>ToDoPlus</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTableWidget" name="tasksTable">
@@ -29,6 +29,24 @@
       <height>491</height>
      </rect>
     </property>
+    <property name="verticalScrollBarPolicy">
+     <enum>Qt::ScrollBarAlwaysOn</enum>
+    </property>
+    <property name="horizontalScrollBarPolicy">
+     <enum>Qt::ScrollBarAlwaysOn</enum>
+    </property>
+    <property name="sizeAdjustPolicy">
+     <enum>QAbstractScrollArea::AdjustToContents</enum>
+    </property>
+    <property name="columnCount">
+     <number>0</number>
+    </property>
+    <attribute name="horizontalHeaderCascadingSectionResizes">
+     <bool>true</bool>
+    </attribute>
+    <attribute name="horizontalHeaderMinimumSectionSize">
+     <number>45</number>
+    </attribute>
    </widget>
    <widget class="QLabel" name="taskHeader">
     <property name="geometry">
@@ -89,7 +107,7 @@
      <rect>
       <x>10</x>
       <y>170</y>
-      <width>191</width>
+      <width>271</width>
       <height>31</height>
      </rect>
     </property>
@@ -99,13 +117,13 @@
      </font>
     </property>
     <property name="text">
-     <string>Estimated Duration</string>
+     <string>Estimated Duration (minutes)</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="subjectBox">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>320</x>
       <y>60</y>
       <width>211</width>
       <height>41</height>
@@ -115,7 +133,7 @@
    <widget class="QLineEdit" name="taskBox">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>320</x>
       <y>110</y>
       <width>211</width>
       <height>41</height>
@@ -125,7 +143,7 @@
    <widget class="QLineEdit" name="timeBox">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>320</x>
       <y>160</y>
       <width>211</width>
       <height>41</height>
@@ -135,7 +153,7 @@
    <widget class="QPushButton" name="addTaskButton">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>410</x>
       <y>220</y>
       <width>121</width>
       <height>41</height>
