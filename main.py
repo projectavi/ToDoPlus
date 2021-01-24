@@ -175,7 +175,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ToDoPlus", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ToDo+", None))
         self.actionNew_Day.setText(QCoreApplication.translate("MainWindow", u"New Day", None))
         self.actionNewDay.setText(QCoreApplication.translate("MainWindow", u"New Day (Clear)", None))
         self.taskHeader.setText(QCoreApplication.translate("MainWindow", u"Add a Task", None))
@@ -221,6 +221,9 @@ class MainWindow(QMainWindow):
         self.second_count = 60
         self.status = "Work"
         self.timer_status = "Play"
+
+        if not os.path.exists(os.path.join(os.path.expanduser("~"), "Documents\ToDo+")):
+            os.mkdir(os.path.join(os.path.expanduser("~"), "Documents\ToDo+")) 
         
         #Setting up the Table
         self.ui.tasksTable.setColumnCount(5)
@@ -338,7 +341,9 @@ class MainWindow(QMainWindow):
         yesterday = date.today() - timedelta(days = 1)
         yesterday = yesterday.strftime("%d-%m-%Y") 
 
-        report = Canvas("Work Report (" + yesterday + ").pdf")
+        save_name = os.path.join(os.path.expanduser("~"), "Documents\ToDo+", "Work Report (" + yesterday + ").pdf")
+
+        report = Canvas(save_name)
         report.drawString(72, 720, "ToDo+ Work Report (" + yesterday + ")")
         report.drawString(72, 690, "Total Number of Tasks: " + str(num_tasks_completed + num_tasks_incompleted))
         report.drawString(72, 670, "Number of Tasks Finished: " + str(num_tasks_completed))
